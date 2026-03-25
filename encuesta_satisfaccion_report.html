@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encuestas de Satisfacción · Veta</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a18;
+    --ink2: #3d3c38;
+    --ink3: #7a7870;
+    --paper: #f5f3ee;
+    --paper2: #ede9e1;
+    --paper3: #e2ddd4;
+    --accent: #2a5f3e;
+    --accent2: #c8532a;
+    --accent3: #8b6914;
+    --line: rgba(26,26,24,0.12);
+    --r: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 48px 64px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 340px; height: 340px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+    pointer-events: none;
+  }
+  .header-tag {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(245,243,238,0.5);
+    margin-bottom: 14px;
+  }
+  header h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(28px, 4vw, 46px);
+    font-weight: 400;
+    line-height: 1.15;
+    max-width: 640px;
+    margin-bottom: 32px;
+  }
+  header h1 em {
+    font-style: italic;
+    color: rgba(245,243,238,0.65);
+  }
+
+  /* ─── TABS ─── */
+  .tab-bar {
+    display: flex;
+    gap: 0;
+    margin-top: 8px;
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    color: rgba(245,243,238,0.45);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    padding: 14px 28px;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+  }
+  .tab-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: transparent;
+    transition: background 0.2s;
+  }
+  .tab-btn:hover { color: rgba(245,243,238,0.75); }
+  .tab-btn.active {
+    color: var(--paper);
+  }
+  .tab-btn.active::after {
+    background: rgba(245,243,238,0.8);
+  }
+
+  /* ─── SURVEY PANELS ─── */
+  .survey-panel { display: none; }
+  .survey-panel.active { display: block; }
+
+  /* ─── SURVEY META BAR ─── */
+  .survey-meta {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 24px 64px 40px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .header-meta {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .header-stat { display: flex; flex-direction: column; gap: 2px; }
+  .header-stat-num { font-size: 26px; font-weight: 300; letter-spacing: -0.02em; }
+  .header-stat-label { font-size: 11px; color: rgba(245,243,238,0.45); text-transform: uppercase; letter-spacing: 0.08em; }
+  .header-divider { width: 1px; background: rgba(255,255,255,0.1); align-self: stretch; }
+
+  /* ─── LAYOUT ─── */
+  main { max-width: 1100px; margin: 0 auto; padding: 52px 40px 80px; }
+  @media (max-width: 700px) {
+    header { padding: 36px 20px 0; }
+    .survey-meta { padding: 20px 20px 32px; }
+    main { padding: 32px 20px 60px; }
+    .tab-btn { padding: 12px 16px; font-size: 12px; }
+  }
+
+  /* ─── SECTION TITLES ─── */
+  .section-title {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink3);
+    margin-bottom: 24px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  section { margin-bottom: 52px; }
+
+  /* ─── METRIC GRID ─── */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    overflow: hidden;
+    margin-bottom: 36px;
+  }
+  .metric-card { background: var(--paper); padding: 24px 20px; }
+  .metric-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink3); margin-bottom: 8px; }
+  .metric-num { font-family: 'Instrument Serif', serif; font-size: 40px; font-weight: 400; line-height: 1; letter-spacing: -0.02em; }
+  .metric-num.green { color: var(--accent); }
+  .metric-num.amber { color: var(--accent3); }
+  .metric-sub { font-size: 12px; color: var(--ink3); margin-top: 5px; }
+
+  /* ─── BARS ─── */
+  .bars-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  @media (max-width: 640px) { .bars-grid { grid-template-columns: 1fr; } }
+  .bar-group-title { font-size: 12px; font-weight: 500; color: var(--ink2); margin-bottom: 12px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .bar-lbl { min-width: 190px; color: var(--ink2); font-size: 12px; }
+  .bar-track { flex: 1; background: var(--paper3); border-radius: 3px; height: 6px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; }
+  .bar-pct { min-width: 32px; text-align: right; font-weight: 500; font-size: 12px; color: var(--ink2); }
+
+  /* ─── CATEGORY CARDS ─── */
+  .cats-list { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+  .cat-item { background: var(--paper); border-bottom: 1px solid var(--line); }
+  .cat-item:last-child { border-bottom: none; }
+  .cat-header { display: flex; align-items: center; gap: 14px; padding: 18px 22px; cursor: pointer; user-select: none; transition: background 0.15s; }
+  .cat-header:hover { background: var(--paper2); }
+  .cat-rank { font-family: 'Instrument Serif', serif; font-size: 26px; color: var(--paper3); line-height: 1; min-width: 30px; text-align: center; font-weight: 400; }
+  .cat-info { flex: 1; }
+  .cat-name { font-size: 14px; font-weight: 500; color: var(--ink); }
+  .cat-count { font-size: 12px; color: var(--ink3); margin-top: 2px; }
+  .cat-right { display: flex; align-items: center; gap: 10px; }
+  .pill { font-size: 10px; font-weight: 500; letter-spacing: 0.06em; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
+  .pill-alta { background: #d6ead9; color: #1e5c2d; }
+  .pill-media { background: #fce9d4; color: #8b4a10; }
+  .pill-baja  { background: #e8e6e1; color: #5a574f; }
+  .chevron { font-size: 11px; color: var(--ink3); transition: transform 0.2s; display: inline-block; }
+  .cat-body { display: none; padding: 0 22px 22px 66px; border-top: 1px solid var(--line); background: #faf9f6; }
+  .cat-body.open { display: block; }
+  .cat-desc { font-size: 13.5px; line-height: 1.7; color: var(--ink2); padding: 14px 0 12px; border-bottom: 1px solid var(--line); margin-bottom: 12px; }
+  .tags-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .tag { font-size: 11px; background: var(--paper3); color: var(--ink2); padding: 3px 9px; border-radius: 20px; }
+  .examples-title { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink3); margin-bottom: 8px; }
+  .example-quote { font-size: 12.5px; color: var(--ink3); font-style: italic; padding: 7px 0 7px 12px; border-left: 2px solid var(--paper3); margin-bottom: 7px; line-height: 1.6; }
+  .example-quote:last-child { margin-bottom: 0; }
+
+  /* ─── POSITIVOS ─── */
+  .positives-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    overflow: hidden;
+  }
+  .pos-card { background: var(--paper); padding: 20px 18px; display: flex; gap: 12px; align-items: flex-start; }
+  .pos-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); margin-top: 6px; flex-shrink: 0; }
+  .pos-text { font-size: 13px; line-height: 1.6; color: var(--ink2); }
+
+  /* ─── CONOCIMIENTO FLAT (encuesta variable) ─── */
+  .conocimiento-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    overflow: hidden;
+    margin-bottom: 36px;
+  }
+  .con-card { background: var(--paper); padding: 20px 18px; }
+  .con-pct { font-family: 'Instrument Serif', serif; font-size: 36px; font-weight: 400; line-height: 1; margin-bottom: 6px; }
+  .con-label { font-size: 12px; color: var(--ink2); line-height: 1.4; }
+
+  /* ─── INFO BOX ─── */
+  .info-box {
+    background: var(--paper2);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    padding: 16px 20px;
+    font-size: 13px;
+    color: var(--ink2);
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+  .info-box strong { color: var(--ink); font-weight: 500; }
+
+  /* ─── FOOTER ─── */
+  footer { text-align: center; padding: 24px 40px; border-top: 1px solid var(--line); font-size: 12px; color: var(--ink3); }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
+  .animate { animation: fadeUp 0.4s ease both; }
+  .a1{animation-delay:.05s} .a2{animation-delay:.1s} .a3{animation-delay:.15s}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">Veta · Enero 2026</div>
+  <h1>Encuestas de<br><em>Satisfacción</em></h1>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('flat', this)">Encuesta FLAT</button>
+    <button class="tab-btn" onclick="switchTab('variable', this)">Encuesta Variable</button>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  PANEL: FLAT                                   -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="panel-flat" class="survey-panel active">
+
+  <div class="survey-meta">
+    <div class="header-meta">
+      <div class="header-stat"><span class="header-stat-num">177</span><span class="header-stat-label">Respuestas</span></div>
+      <div class="header-divider"></div>
+      <div class="header-stat"><span class="header-stat-num">8.9</span><span class="header-stat-label">NPS promedio</span></div>
+      <div class="header-divider"></div>
+      <div class="header-stat"><span class="header-stat-num">11</span><span class="header-stat-label">Categorías</span></div>
+      <div class="header-divider"></div>
+      <div class="header-stat"><span class="header-stat-num">60%</span><span class="header-stat-label">Respuesta inmediata</span></div>
+    </div>
+  </div>
+
+  <main>
+    <section class="animate a1">
+      <div class="section-title">Métricas cuantitativas</div>
+      <div class="metrics-grid">
+        <div class="metric-card"><div class="metric-label">NPS VetaFlat</div><div class="metric-num green">8.9</div><div class="metric-sub">sobre 10</div></div>
+        <div class="metric-card"><div class="metric-label">Rentabilidad del plan</div><div class="metric-num green">7.9</div><div class="metric-sub">sobre 10</div></div>
+        <div class="metric-card"><div class="metric-label">Utilidad de Matriz</div><div class="metric-num green">9.4</div><div class="metric-sub">sobre 10</div></div>
+        <div class="metric-card"><div class="metric-label">Respuesta inmediata</div><div class="metric-num green">60%</div><div class="metric-sub">106 de 177 clientes</div></div>
+        <div class="metric-card"><div class="metric-label">Claridad del plan</div><div class="metric-num amber">88%</div><div class="metric-sub">claro o muy claro</div></div>
+        <div class="metric-card"><div class="metric-label">Respuesta adecuada o mejor</div><div class="metric-num green">95%</div><div class="metric-sub">168 de 177</div></div>
+      </div>
+
+      <div class="bars-grid">
+        <div class="bar-group">
+          <div class="bar-group-title">Uso del cupo descubierto</div>
+          <div class="bar-row"><div class="bar-lbl">En oportunidades especiales</div><div class="bar-track"><div class="bar-fill" style="width:33%;background:#2a5f3e"></div></div><div class="bar-pct">33%</div></div>
+          <div class="bar-row"><div class="bar-lbl">Frecuentemente</div><div class="bar-track"><div class="bar-fill" style="width:33%;background:#2a5f3e"></div></div><div class="bar-pct">33%</div></div>
+          <div class="bar-row"><div class="bar-lbl">Nunca</div><div class="bar-track"><div class="bar-fill" style="width:19%;background:#b5afa3"></div></div><div class="bar-pct">19%</div></div>
+          <div class="bar-row"><div class="bar-lbl">Siempre apalancado</div><div class="bar-track"><div class="bar-fill" style="width:15%;background:#8b6914"></div></div><div class="bar-pct">15%</div></div>
+        </div>
+        <div class="bar-group">
+          <div class="bar-group-title">Uso del cupo caución</div>
+          <div class="bar-row"><div class="bar-lbl">Nunca</div><div class="bar-track"><div class="bar-fill" style="width:34%;background:#b5afa3"></div></div><div class="bar-pct">34%</div></div>
+          <div class="bar-row"><div class="bar-lbl">En oportunidades especiales</div><div class="bar-track"><div class="bar-fill" style="width:34%;background:#2a5f3e"></div></div><div class="bar-pct">34%</div></div>
+          <div class="bar-row"><div class="bar-lbl">Frecuentemente</div><div class="bar-track"><div class="bar-fill" style="width:23%;background:#2a5f3e"></div></div><div class="bar-pct">23%</div></div>
+          <div class="bar-row"><div class="bar-lbl">Siempre</div><div class="bar-track"><div class="bar-fill" style="width:10%;background:#8b6914"></div></div><div class="bar-pct">10%</div></div>
+        </div>
+        <div class="bar-group">
+          <div class="bar-group-title">Claridad del plan y su pago</div>
+          <div class="bar-row"><div class="bar-lbl">Bastante clara</div><div class="bar-track"><div class="bar-fill" style="width:46%;background:#2a5f3e"></div></div><div class="bar-pct">46%</div></div>
+          <div class="bar-row"><div class="bar-lbl">Sí, muy clara</div><div class="bar-track"><div class="bar-fill" style="width:42%;background:#2a5f3e"></div></div><div class="bar-pct">42%</div></div>
+          <div class="bar-row"><div class="bar-lbl">Confusa</div><div class="bar-track"><div class="bar-fill" style="width:10%;background:#c8532a"></div></div><div class="bar-pct">10%</div></div>
+          <div class="bar-row"><div class="bar-lbl">No la entiendo</div><div class="bar-track"><div class="bar-fill" style="width:1%;background:#c8532a"></div></div><div class="bar-pct">1%</div></div>
+        </div>
+        <div class="bar-group">
+          <div class="bar-group-title">Inmediatez de las respuestas</div>
+          <div class="bar-row"><div class="bar-lbl">Sí, es inmediato</div><div class="bar-track"><div class="bar-fill" style="width:60%;background:#2a5f3e"></div></div><div class="bar-pct">60%</div></div>
+          <div class="bar-row"><div class="bar-lbl">Es adecuado</div><div class="bar-track"><div class="bar-fill" style="width:35%;background:#8b6914"></div></div><div class="bar-pct">35%</div></div>
+          <div class="bar-row"><div class="bar-lbl">No</div><div class="bar-track"><div class="bar-fill" style="width:5%;background:#c8532a"></div></div><div class="bar-pct">5%</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="animate a2">
+      <div class="section-title">Temas relevantes por categoría — expandí para ver detalle y citas</div>
+      <div class="cats-list" id="cats-flat"></div>
+    </section>
+
+    <section class="animate a3">
+      <div class="section-title">Lo que más valoran los clientes</div>
+      <div class="positives-grid">
+        <div class="pos-card"><div class="pos-dot"></div><div class="pos-text">Atención personalizada y rapidez de respuesta de los asesores — mencionado por ~40% de quienes dejaron comentarios</div></div>
+        <div class="pos-card"><div class="pos-dot"></div><div class="pos-text">Mejora notable en la estabilidad de Matriz respecto al año anterior</div></div>
+        <div class="pos-card"><div class="pos-dot"></div><div class="pos-text">Plan costo/beneficio percibido como razonable para operadores activos</div></div>
+        <div class="pos-card"><div class="pos-dot"></div><div class="pos-text">Resolución rápida de problemas cuando ocurren — sentido de respaldo</div></div>
+        <div class="pos-card"><div class="pos-dot"></div><div class="pos-text">Confianza en el equipo humano y sentido de comunidad construido</div></div>
+        <div class="pos-card"><div class="pos-dot"></div><div class="pos-text">Clientes referidores activos que recomiendan a colegas constantemente</div></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  PANEL: VARIABLE                               -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="panel-variable" class="survey-panel">
+
+  <div class="survey-meta">
+    <div class="header-meta">
+      <div class="header-stat"><span class="header-stat-num">170</span><span class="header-stat-label">Respuestas</span></div>
+      <div class="header-divider"></div>
+      <div class="header-stat"><span class="header-stat-num">9.1</span><span class="header-stat-label">NPS promedio</span></div>
+      <div class="header-divider"></div>
+      <div class="header-stat"><span class="header-stat-num">9.2</span><span class="header-stat-label">Calificación atención</span></div>
+      <div class="header-divider"></div>
+      <div class="header-stat"><span class="header-stat-num">67%</span><span class="header-stat-label">Conoce planes FLAT</span></div>
+    </div>
+  </div>
+
+  <main>
+    <section class="animate a1">
+      <div class="section-title">Métricas cuantitativas</div>
+      <div class="metrics-grid">
+        <div class="metric-card"><div class="metric-label">NPS VetaCap</div><div class="metric-num green">9.1</div><div class="metric-sub">sobre 10</div></div>
+        <div class="metric-card"><div class="metric-label">Calificación atención</div><div class="metric-num green">9.2</div><div class="metric-sub">sobre 10</div></div>
+        <div class="metric-card"><div class="metric-label">Utilidad de Matriz</div><div class="metric-num green">9.6</div><div class="metric-sub">sobre 10</div></div>
+        <div class="metric-card"><div class="metric-label">Comisiones vs. servicio</div><div class="metric-num green">8.4</div><div class="metric-sub">sobre 10</div></div>
+        <div class="metric-card"><div class="metric-label">Evalúan sumarse al FLAT</div><div class="metric-num amber">19%</div><div class="metric-sub">32 de 170</div></div>
+        <div class="metric-card"><div class="metric-label">No lo conocen</div><div class="metric-num amber">4%</div><div class="metric-sub">6 de 170</div></div>
+      </div>
+
+      <div class="section-title" style="margin-top:8px">Conocimiento de planes FLAT</div>
+      <div class="conocimiento-grid">
+        <div class="con-card"><div class="con-pct" style="color:var(--accent3)">67%</div><div class="con-label">Lo conocen pero no aplica a sus volúmenes</div></div>
+        <div class="con-card"><div class="con-pct" style="color:var(--accent)">19%</div><div class="con-label">Lo conocen y están evaluando registrarse</div></div>
+        <div class="con-card"><div class="con-pct" style="color:var(--ink3)">11%</div><div class="con-label">Lo conocen pero no les interesa</div></div>
+        <div class="con-card"><div class="con-pct" style="color:var(--ink3)">4%</div><div class="con-label">No conocen los planes FLAT</div></div>
+      </div>
+    </section>
+
+    <section class="animate a2">
+      <div class="section-title">Temas relevantes por categoría — expandí para ver detalle y citas</div>
+      <div class="info-box">
+        <strong>Contexto:</strong> Esta encuesta es a clientes con comisiones variables (no FLAT). Los temas giran principalmente en torno a la barrera de entrada al FLAT, restricciones operativas, y mejoras de plataforma que afectan a todos los clientes.
+      </div>
+      <div class="cats-list" id="cats-variable"></div>
+    </section>
+
+    <section class="animate a3">
+      <div class="section-title">Lo que más valoran los clientes</div>
+      <div class="positives-grid">
+        <div class="pos-card"><div class="pos-dot"></div><div class="pos-text">Atención por WhatsApp: respuesta rápida y amable destacada por la mayoría</div></div>
+        <div class="pos-card"><div class="pos-dot"></div><div class="pos-text">Comisiones percibidas como competitivas respecto a otros brokers del mercado</div></div>
+        <div class="pos-card"><div class="pos-dot"></div><div class="pos-text">Matriz como diferenciador clave que los mantiene en Veta pese a otras opciones</div></div>
+        <div class="pos-card"><div class="pos-dot"></div><div class="pos-text">Varios clientes refieren activamente a colegas y amigos</div></div>
+        <div class="pos-card"><div class="pos-dot"></div><div class="pos-text">Mejora percibida en la plataforma respecto a encuestas anteriores</div></div>
+        <div class="pos-card"><div class="pos-dot"></div><div class="pos-text">Calidad humana del equipo asesor mencionada como principal razón de permanencia</div></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer>
+  Encuestas de Satisfacción Veta · Enero 2026 · 177 respuestas FLAT + 170 respuestas Variable
+</footer>
+
+<script>
+/* ── TAB SWITCH ── */
+function switchTab(id, btn) {
+  document.querySelectorAll('.survey-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ── TOGGLE CARD ── */
+function toggle(header) {
+  const body = header.nextElementSibling;
+  const ch = header.querySelector('.chevron');
+  const isOpen = body.classList.toggle('open');
+  ch.style.transform = isOpen ? 'rotate(180deg)' : '';
+}
+
+function buildCats(containerId, data) {
+  const container = document.getElementById(containerId);
+  data.forEach((d, i) => {
+    const pillMap = { alta: "pill-alta", media: "pill-media", baja: "pill-baja" };
+    const pillTxt = { alta: "Alta prioridad", media: "Prioridad media", baja: "A considerar" };
+    const item = document.createElement('div');
+    item.className = 'cat-item';
+    item.innerHTML = `
+      <div class="cat-header" onclick="toggle(this)">
+        <div class="cat-rank">${String(i+1).padStart(2,'0')}</div>
+        <div class="cat-info">
+          <div class="cat-name">${d.name}</div>
+          <div class="cat-count">${d.count}</div>
+        </div>
+        <div class="cat-right">
+          <span class="pill ${pillMap[d.priority]}">${pillTxt[d.priority]}</span>
+          <span class="chevron">▾</span>
+        </div>
+      </div>
+      <div class="cat-body">
+        <div class="cat-desc">${d.desc}</div>
+        <div class="tags-row">${d.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+        <div class="examples-title">Voces de los clientes</div>
+        ${d.quotes.map(q=>`<div class="example-quote">${q}</div>`).join('')}
+      </div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+/* ══ DATA: FLAT ══ */
+const flatData = [
+  {
+    name: "Caución tomadora manual",
+    count: "~45 menciones",
+    priority: "alta",
+    desc: "El pedido más repetido de toda la encuesta. Los clientes quieren poder cargar órdenes de caución tomadora directamente desde Matriz, sin depender del asesor. Se pierden oportunidades de mercado por la demora en la comunicación vía WhatsApp.",
+    tags: ["Tomar caución desde Matriz", "Caución en pesos y dólares", "Precios límite propios"],
+    quotes: [
+      "\"Me gustaría poder tomar yo caución por el monto de mi descubierto\"",
+      "\"Poder poner puntas tomadoras en la caución desde Matriz\"",
+      "\"Que la caución tomadora sea automática, que no tenga que solicitarse al asesor\""
+    ]
+  },
+  {
+    name: "Descubierto: ampliación y nuevos instrumentos",
+    count: "~40 menciones",
+    priority: "alta",
+    desc: "Pedido de más descubierto en monto y extensión a nuevos activos: cedears, ONs, Bopreales, CI en pesos y dólares. También se pide que el cupo disponible esté activo automáticamente sin necesidad de solicitarlo cada vez.",
+    tags: ["Descubierto en CI", "Shortear cedears/ONs", "Descubierto en dólares", "Cupo automático"],
+    quotes: [
+      "\"Que el descubierto esté cargado siempre, sin tener que reclamarlo\"",
+      "\"Descubierto en CI que cierre en el mismo día\"",
+      "\"Poder vender cedears líquidos en descubierto\""
+    ]
+  },
+  {
+    name: "API y trading algorítmico",
+    count: "~18 menciones",
+    priority: "alta",
+    desc: "Segmento activo que pide acceso a API para automatizar estrategias. Mencionan acceso a Primary sin homologación o con proceso más simple. También se pide soporte interno para quienes quieren incursionarse en trading algorítmico.",
+    tags: ["API Primary", "Homologación simplificada", "Bots en Python", "Soporte algo trading"],
+    quotes: [
+      "\"Acceso a API de Matriz sin necesidad de homologación\"",
+      "\"Que haya una API que permita operar por código de programación de forma automática\"",
+      "\"Sería bueno que haya alguien en Veta que ayude a quienes quieren incursionarse en trading algorítmico\""
+    ]
+  },
+  {
+    name: "Futuros y derivados agro",
+    count: "~16 menciones",
+    priority: "alta",
+    desc: "Pedido consistente de acceso a futuros agro (Rofex/A3) para operar commodities. También se menciona futuros de oro y WTI.",
+    tags: ["Futuros Rofex agro", "A3 commodities", "Futuros oro / WTI"],
+    quotes: [
+      "\"Agregaría poder hacer operaciones de futuros de agro en A3\"",
+      "\"Futuros de ORO y WTI\"",
+      "\"Sumar futuros y opciones AGRO. Posibilidad de operar en el exterior\""
+    ]
+  },
+  {
+    name: "Educación y claridad del plan",
+    count: "~20 menciones",
+    priority: "media",
+    desc: "Muchos clientes reconocen que no aprovechan el plan por falta de conocimiento. Piden instructivos, videos educativos y ejemplos prácticos de descubierto, caución y apalancamiento.",
+    tags: ["Videos tutoriales", "Instructivo escrito", "Ejemplos de uso", "Capacitaciones"],
+    quotes: [
+      "\"Debería armarse un instructivo más detallado\"",
+      "\"Videos educativos de disponibilidad permanente sobre cómo sacarle el máximo provecho al plan\"",
+      "\"Reglas para operar con descubierto y apalancamiento en un texto escrito con ejemplos\""
+    ]
+  },
+  {
+    name: "Sincronización Matriz / Home Broker",
+    count: "~15 menciones",
+    priority: "media",
+    desc: "Desfasaje entre saldos en Matriz y el HB genera confusión operativa, sobrecarga al asesor y riesgo de quedar en descubierto sin saberlo.",
+    tags: ["Saldos en tiempo real", "Garantías consistentes", "Acreditaciones automáticas"],
+    quotes: [
+      "\"Sincronización en tiempo real entre Matriz y HB\"",
+      "\"Sería bueno que cuando se hace un depósito éste aparezca automáticamente en Matriz\"",
+      "\"Las operaciones de descubierto son difíciles de tracear al día siguiente\""
+    ]
+  },
+  {
+    name: "Transferencias y acreditaciones lentas",
+    count: "~14 menciones",
+    priority: "media",
+    desc: "Retiros y acreditaciones percibidos como lentos comparados con otros brokers. Se pide que sean inmediatos y online sin intervención del asesor.",
+    tags: ["Retiros inmediatos", "Cash out online", "Acreditaciones rápidas"],
+    quotes: [
+      "\"Las extracciones deberían ser más ágiles y no depender de la intervención de contactos\"",
+      "\"El cash out podría ser online\"",
+      "\"Me preocupa la demora en la acreditación del vencimiento de las letras\""
+    ]
+  },
+  {
+    name: "Acceso a licitaciones y mercado primario",
+    count: "~12 menciones",
+    priority: "media",
+    desc: "Clientes que operan ONs y bonos piden participar en licitaciones del Tesoro y empresas. También piden que Matriz incorpore nuevos instrumentos más rápido.",
+    tags: ["Licitaciones Tesoro", "ONs nuevas en Matriz", "Canjes de bonos"],
+    quotes: [
+      "\"Que se pueda entrar a las licitaciones del Tesoro\"",
+      "\"Incorporar licitaciones de distintos instrumentos\"",
+      "\"Matriz tarda días en tener disponible una ON que ya salió al mercado secundario\""
+    ]
+  },
+  {
+    name: "Opciones: garantías y ejercicio",
+    count: "~12 menciones",
+    priority: "media",
+    desc: "Operadores de opciones piden mejor manejo de garantías, ejercicio automático de bases ITM, aviso por WhatsApp al ser ejercidos, y ejercicios sin comisión.",
+    tags: ["Garantías opciones", "Ejercicio automático ITM", "Aviso ejercicio", "Sin comisión ejercicio"],
+    quotes: [
+      "\"Mayor disponibilidad de garantías para evitar pedir el ajuste día a día\"",
+      "\"Aviso por WhatsApp cuando ejercen una opción lanzada\"",
+      "\"Que en fechas de cierre las bases ITM se ejerzan automáticamente\""
+    ]
+  },
+  {
+    name: "Grupo de WhatsApp y comunicación",
+    count: "~10 menciones",
+    priority: "baja",
+    desc: "Pedidos de más moderación en el grupo (off-topic, stickers, debates). También se sugiere identificar al asesor que atiende y explorar canales complementarios como YouTube educativo.",
+    tags: ["Moderación grupo WA", "Identificar asesor", "Canal educativo"],
+    quotes: [
+      "\"Reglas más estrictas en el grupo de WApp\"",
+      "\"Cuando les escribimos al WhatsApp pongan el nombre del que nos está atendiendo\"",
+      "\"El grupo aporta valor limitado, podría explorarse YouTube con cursos gratuitos\""
+    ]
+  },
+  {
+    name: "Estabilidad del asesor asignado",
+    count: "~8 menciones",
+    priority: "baja",
+    desc: "Algunos clientes reportan cambios frecuentes de asesor asignado, lo que rompe la relación y el contexto operativo.",
+    tags: ["Rotación asesores", "Continuidad del vínculo"],
+    quotes: [
+      "\"Sería deseable que no me cambien de asesor tan seguido\"",
+      "\"Los asesores deberían ser permanentes así se afianza el vínculo\""
+    ]
+  }
+];
+
+/* ══ DATA: VARIABLE ══ */
+const variableData = [
+  {
+    name: "Costo del plan FLAT como barrera de entrada",
+    count: "~55 menciones",
+    priority: "alta",
+    desc: "El principal freno para no contratar el FLAT es que el costo fijo mensual no se justifica con los volúmenes operados. Se pide un plan más económico o escalonado para operadores de menor volumen, con posibilidad de activarlo y desactivarlo mensualmente.",
+    tags: ["Plan más económico", "Tope de volumen", "Plan escalado", "Plan mensual flexible"],
+    quotes: [
+      "\"Para los retail el flat es caro, para volúmenes bajos no se justifica\"",
+      "\"Un plan más económico sin descubierto para practicar operatorias con opciones\"",
+      "\"Un plan de menor costo con tope de volumen, así se justifica para cuentas chicas\""
+    ]
+  },
+  {
+    name: "Restricción de opciones sin plan FLAT",
+    count: "~25 menciones",
+    priority: "alta",
+    desc: "El cambio de octubre 2025 que restringió la venta de opciones al descubierto a los clientes sin FLAT es el punto más conflictivo de la encuesta. Varios clientes perciben la medida como un castigo y mencionan haberse ido o estar evaluando irse a otro broker.",
+    tags: ["Opciones sin FLAT", "Lanzamiento descubierto", "Garantías sin plan", "Restricción octubre 2025"],
+    quotes: [
+      "\"El FLAT me parece correcto pero me jode mucho las restricciones por no tenerlo, parece un castigo\"",
+      "\"Dejé de operar opciones en VetaCap porque pusieron restricciones y me fui a otro broker\"",
+      "\"No me gusta que tenga que tener FLAT para operar opciones descubierto aún teniendo garantías\""
+    ]
+  },
+  {
+    name: "Acreditaciones y transferencias lentas",
+    count: "~35 menciones",
+    priority: "alta",
+    desc: "El problema más mencionado en comentarios libres. Los depósitos no impactan automáticamente en Matriz — hay que avisar al asesor para que los cargue manualmente. Los retiros también demoran. Se compara desfavorablemente con otros brokers.",
+    tags: ["Acreditación automática en Matriz", "Retiros inmediatos", "Sin intervención del asesor"],
+    quotes: [
+      "\"Los depósitos no aparecen nunca en Matriz, tengo que avisar siempre\"",
+      "\"He dejado de fondear en Veta: tengo que avisar cada vez que fondo y los retiros son un suplicio\"",
+      "\"Tardan 24hs en acreditar el depósito; en otros brokers es inmediato y transparente\""
+    ]
+  },
+  {
+    name: "API y trading algorítmico",
+    count: "~12 menciones",
+    priority: "alta",
+    desc: "También presente en el segmento Variable. Se pide acceso a API de Primary para bots y scripts. Algunos clientes mencionan que esto les haría llevar más capital a Veta.",
+    tags: ["API Primary", "Bots Python", "Trading automático"],
+    quotes: [
+      "\"Habiliten la API para los que nos gusta operar en automático, déjenla libre y les van a aparecer clientes de abajo de las piedras\"",
+      "\"Acceso a APIs para realizar mis propias consultas en tiempo real\"",
+      "\"Trading algorítmico: poder acceder a buenos archivos históricos\""
+    ]
+  },
+  {
+    name: "Órdenes con duración mayor a un día",
+    count: "~12 menciones",
+    priority: "media",
+    desc: "Los clientes piden poder cargar órdenes GTD (vigentes hasta ejecución), en lugar del actual vencimiento diario. Esto aplica especialmente a operadores de letras, bonos y opciones que no pueden monitorear el mercado todo el día.",
+    tags: ["Órdenes GTD", "Vencimiento multi-día", "Órdenes pendientes"],
+    quotes: [
+      "\"Las órdenes pendientes se cierran al final del día y hay que volver a ponerlas, es muy molesto\"",
+      "\"Poder cargar órdenes que duren más de 1 día, me pasa que quedan al final de la cola\"",
+      "\"Órdenes vigentes hasta su ejecución, no que se reseteen\""
+    ]
+  },
+  {
+    name: "FCI para personas humanas",
+    count: "~10 menciones",
+    priority: "media",
+    desc: "Clientes piden acceso a Fondos Comunes de Inversión desde Matriz para gestionar la liquidez en pesos y dólares sin recurrir a la caución.",
+    tags: ["FCI en Matriz", "Liquidez en pesos", "Liquidez en dólares"],
+    quotes: [
+      "\"Deberían sumar FCI para poder volcar liquidez sin necesidad de hacer caución\"",
+      "\"No puedo operar FCI desde Matriz\"",
+      "\"Faltan FCI para personas humanas\""
+    ]
+  },
+  {
+    name: "Sincronización Matriz / HB y saldos",
+    count: "~15 menciones",
+    priority: "media",
+    desc: "Problema compartido con los clientes FLAT: saldos desfasados entre Matriz y HB, con necesidad de intervención manual del asesor.",
+    tags: ["Saldos en tiempo real", "Sin intervención del asesor", "Acreditación automática"],
+    quotes: [
+      "\"Siempre debo solicitar por WA que actualicen el saldo en Matriz\"",
+      "\"No se actualiza por depósitos y retiros, pero me atendieron rápido para solucionarlo\"",
+      "\"Me parece poco amigable la parte de ingresos y egresos de fondos, debería ser automático\""
+    ]
+  },
+  {
+    name: "Notificaciones de dividendos, rentas y vencimientos",
+    count: "~10 menciones",
+    priority: "media",
+    desc: "Los clientes quieren recibir avisos proactivos de cobro de dividendos, rentas de ONs y vencimiento de letras para poder planificar reinversiones sin tener que preguntar al asesor.",
+    tags: ["Aviso dividendos", "Calendario de rentas", "Aviso vencimiento letras"],
+    quotes: [
+      "\"Me gustaría recibir una notificación personalizada con el tema de dividendos y rentas por cobrar\"",
+      "\"Deberían sumar información de eventos, cobro de dividendos y amortizaciones\"",
+      "\"Me preocupa la demora en la acreditación del vencimiento de las letras: me perdí reinvertir\""
+    ]
+  },
+  {
+    name: "Rotación de asesores",
+    count: "~8 menciones",
+    priority: "baja",
+    desc: "Presente en ambas encuestas. El cambio frecuente de asesor afecta la relación y la continuidad de contexto, especialmente para clientes de bajo volumen.",
+    tags: ["Continuidad del asesor", "Vínculo con el cliente"],
+    quotes: [
+      "\"A veces me mareo con la cantidad de asesores dando vuelta, todos los meses me avisan que cambió\"",
+      "\"No me gusta que nos cambien constantemente de ejecutivo, no da buena imagen\"",
+      "\"Identificarse con nombre al atender por WA, para saber con quién estoy tratando\""
+    ]
+  },
+  {
+    name: "Mejoras en Home Broker",
+    count: "~8 menciones",
+    priority: "baja",
+    desc: "El HB es percibido como antiguo y poco amigable comparado con Matriz. También se pide habilitación para operar opciones desde HB como alternativa cuando Matriz se cae.",
+    tags: ["HB más moderno", "Opciones en HB", "Interfaz de saldos"],
+    quotes: [
+      "\"La plataforma de Home Broker es muy antigua y poco amigable, deberían cambiarla\"",
+      "\"Sugerir habilitar HB para operar opciones, ya que Matriz suele caerse en los peores momentos\"",
+      "\"La forma en que HB presenta los fondos disponibles es bastante confusa\""
+    ]
+  }
+];
+
+buildCats('cats-flat', flatData);
+buildCats('cats-variable', variableData);
+</script>
+</body>
+</html>
